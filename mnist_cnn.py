@@ -14,17 +14,14 @@ from tensorflow.keras.datasets import mnist
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten, Reshape
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D
-from keras import backend as K
+from tensorflow.keras import backend as K
 
 from tensorflow.keras.models import Model
 from nvtx.plugins.tf.keras.layers import NVTXStart, NVTXEnd
 from nvtx.plugins.tf.keras.callbacks import NVTXCallback
 import numpy as np
 
-os.environ["CUDA_DEVICE_ORDER"] = "00000000:47:00.0"
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
-
-batch_size = 128
+batch_size = 16
 num_classes = 10
 epochs = 1
 
@@ -59,9 +56,7 @@ y_train = keras.utils.to_categorical(y_train, num_classes)
 y_test = keras.utils.to_categorical(y_test, num_classes)
 
 x_train = np.random.random(size=(60000, 256, 256, 1))
-x_test = np.random.random(size=(10000, 256, 256, 1))
 x_train /= 255
-x_test /= 255
 
 # model = Sequential()
 # model.add(Conv2D(32, kernel_size=(3, 3),
@@ -79,14 +74,13 @@ def get_model(input_shape=(28, 28, 1)):
     inputs = Input(input_shape)
 
     x = inputs
-    outs = []
     # x = Reshape((1, 256, 256), input_shape=input_shape)(x)
     for kernelSize_y in [4, 16, 64, 256]:
         for kernelSize_x in [2, 7, 12, 17]:
             message='Conv2D (%d, %d)' % (kernelSize_x, kernelSize_y)
             print(message)
-            x, marker_id, domain_id = NVTXStart(message=message, domain_name='forward', trainable=True)(inputs)
-            x = Conv2D(filters=64, kernel_size=(kernelSize_x, kernelSize_y), activation='relu')(x)
+            x, marker_id, domain_id = NVTXStart(message=message, domain_name='forward', trainable=True)(x)
+            x = Conv2D(filters=64, kernel_size=(kernelSize_x, kernelSize_y), activation='relu', padding='same')(x)
             x = NVTXEnd(grad_message='Conv2D (%d, %d) grad', grad_domain_name='backwards')([x, marker_id, domain_id])
 
     out_ = Flatten()(x)
