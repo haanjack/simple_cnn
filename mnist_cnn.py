@@ -43,6 +43,13 @@ else:
     x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
     input_shape = (img_rows, img_cols, 1)
 
+
+# convert class vectors to binary class matrices
+y_train = keras.utils.to_categorical(y_train, num_classes)
+y_test = keras.utils.to_categorical(y_test, num_classes)
+
+x_train = np.random.random(size=(60000, 256, 256, 1))
+x_test = np.random.random(size=(10000, 256, 256, 1))
 x_train = x_train.astype('float32')
 x_test = x_test.astype('float32')
 x_train /= 255
@@ -50,13 +57,6 @@ x_test /= 255
 print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
-
-# convert class vectors to binary class matrices
-y_train = keras.utils.to_categorical(y_train, num_classes)
-y_test = keras.utils.to_categorical(y_test, num_classes)
-
-x_train = np.random.random(size=(60000, 256, 256, 1))
-x_train /= 255
 
 # model = Sequential()
 # model.add(Conv2D(32, kernel_size=(3, 3),
@@ -80,11 +80,11 @@ def get_model(input_shape=(28, 28, 1)):
             message='Conv2D (%d, %d)' % (kernelSize_x, kernelSize_y)
             print(message)
             x, marker_id, domain_id = NVTXStart(message=message, domain_name='forward', trainable=True)(x)
-            x = Conv2D(filters=64, kernel_size=(kernelSize_x, kernelSize_y), activation='relu', padding='same')(x)
-            x = NVTXEnd(grad_message='Conv2D (%d, %d) grad', grad_domain_name='backwards')([x, marker_id, domain_id])
+            x = Conv2D(filters=16, kernel_size=(kernelSize_x, kernelSize_y), activation='relu', padding='same')(x)
+            x = NVTXEnd(grad_message=message, grad_domain_name='backwards')([x, marker_id, domain_id])
 
-    out_ = Flatten()(x)
-    predictions = Dense(num_classes, activation='softmax')(out_)
+    x = Flatten()(x)
+    predictions = Dense(num_classes, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions)
     return model
 
