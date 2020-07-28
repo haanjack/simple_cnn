@@ -21,7 +21,7 @@ from nvtx.plugins.tf.keras.layers import NVTXStart, NVTXEnd
 from nvtx.plugins.tf.keras.callbacks import NVTXCallback
 import numpy as np
 
-batch_size = 8
+batch_size = 4
 num_classes = 10
 epochs = 1
 
@@ -63,7 +63,7 @@ def get_model(input_shape=(28, 28, 1)):
 
     x = inputs
     # x = Reshape((1, 256, 256), input_shape=input_shape)(x)
-    for kernelSize_y in [4, 16, 32, 64]:
+    for kernelSize_y in [4, 8, 32, 64]:
         for kernelSize_x in [2, 7, 12, 17]:
             message='Conv2D (%d, %d)' % (kernelSize_x, kernelSize_y)
             print(message)
