@@ -21,7 +21,7 @@ from nvtx.plugins.tf.keras.layers import NVTXStart, NVTXEnd
 from nvtx.plugins.tf.keras.callbacks import NVTXCallback
 import numpy as np
 
-batch_size = 16
+batch_size = 8
 num_classes = 10
 epochs = 1
 
@@ -58,29 +58,17 @@ print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
 
-# model = Sequential()
-# model.add(Conv2D(32, kernel_size=(3, 3),
-#                  activation='relu',
-#                  input_shape=input_shape))
-# model.add(Conv2D(64, (3, 3), activation='relu'))
-# model.add(MaxPooling2D(pool_size=(2, 2)))
-# model.add(Dropout(0.25))
-# model.add(Flatten())
-# model.add(Dense(128, activation='relu'))
-# model.add(Dropout(0.5))
-# model.add(Dense(num_classes, activation='softmax'))
-
 def get_model(input_shape=(28, 28, 1)):
     inputs = Input(input_shape)
 
     x = inputs
     # x = Reshape((1, 256, 256), input_shape=input_shape)(x)
-    for kernelSize_y in [4, 16, 64, 256]:
+    for kernelSize_y in [4, 16, 32, 64]:
         for kernelSize_x in [2, 7, 12, 17]:
             message='Conv2D (%d, %d)' % (kernelSize_x, kernelSize_y)
             print(message)
             x, marker_id, domain_id = NVTXStart(message=message, domain_name='forward', trainable=True)(x)
-            x = Conv2D(filters=16, kernel_size=(kernelSize_x, kernelSize_y), activation='relu', padding='same')(x)
+            x = Conv2D(filters=32, kernel_size=(kernelSize_x, kernelSize_y), activation='relu', padding='same')(x)
             x = NVTXEnd(grad_message=message, grad_domain_name='backwards')([x, marker_id, domain_id])
 
     x = Flatten()(x)
