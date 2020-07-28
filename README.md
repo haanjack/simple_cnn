@@ -5,7 +5,7 @@ Benchmark Conv2D layers with different weight sizes.
 ## How to profile?
 
 ```bash
-nsys profile -y 120 -d 240 -o cnn_benchmark -t osrt,cuda,cublas,cudnn,nvtx python mnist_cnn.py
+nsys profile -y 60 -d 60 -o cnn_benchmark -t osrt,cuda,cublas,cudnn,nvtx python mnist_cnn.py
 ```
 
 This command generates `cnn_benchmark.qdrep` file. You may want download that file and open with [Nsight System](https://developer.nvidia.com/nsight-systems). If you have install CUDA toolkit on your host machine, you don't have to install this manually.
